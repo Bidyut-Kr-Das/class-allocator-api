@@ -7,6 +7,7 @@ import corsSetup from "#cors/index.js";
 
 //helper function import
 import handleError from "#middlewares/error.middleware.js";
+import classroomRouter from "#routes/classroom.routes.js";
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.use(express.json());
 //second middleware is cookie parser
 app.use(cookieParser());
 
-
+app.use(`/api/v2/classrooms`, classroomRouter);
 
 app.use(handleError);
 
