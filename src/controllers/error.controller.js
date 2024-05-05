@@ -1,10 +1,10 @@
-import AppError from "#utils/appError.js";
+import ApiError from "#src/utils/apiError.js";
 
 export const sendDevelopmentError = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
-    error: err
+    error: err,
   });
 };
 
@@ -13,16 +13,16 @@ export const sendProductionError = (err, res) => {
   if (err.isOperational)
     return res.status(err.statusCode).json({
       status: err.status,
-      message: err.message
+      message: err.message,
     });
   return res.status(500).json({
     status: "error",
-    message: "Something went wrong"
+    message: "Something went wrong",
   });
 };
 
-export const duplicationError = err => {
+export const duplicationError = (err) => {
   const keys = Object.keys(err.keyValue);
   const message = `${keys[0]} already registered.`;
-  return new AppError(400, message);
+  return new ApiError(400, message);
 };

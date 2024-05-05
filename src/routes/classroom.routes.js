@@ -1,7 +1,10 @@
 import { Router } from "express";
-import { getClassroomDetails } from "#controllers/classroom.controller.js";
+import {
+  getClassroomDetails,
+  createClass,
+} from "#controllers/classroom.controller.js";
 const router = Router();
 
-router.route("/:floorNo").get(getClassroomDetails);
+router.route("/:floorNo").get(getClassroomDetails).post(createClass);
 
 export default router;

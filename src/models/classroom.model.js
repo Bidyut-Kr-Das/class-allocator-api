@@ -5,11 +5,12 @@ const classroomSchema = new Schema(
     roomNo: {
       type: String,
       required: true,
-      // unique: true,
+      unique: true,
     },
     floorNo: {
       type: Number,
       required: true,
+      unique: true,
     },
     classes: {
       type: [
@@ -20,7 +21,8 @@ const classroomSchema = new Schema(
             default: "Extra class",
           },
           teacher: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: "Teacher",
             required: true,
           },
           startTime: {
