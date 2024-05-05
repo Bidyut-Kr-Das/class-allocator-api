@@ -10,7 +10,6 @@ const classroomSchema = new Schema(
     floorNo: {
       type: Number,
       required: true,
-      unique: true,
     },
     classes: {
       type: [

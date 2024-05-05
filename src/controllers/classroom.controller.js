@@ -4,20 +4,64 @@ import catchAsyncError from "#utils/catchAsyncError.js";
 import Classroom from "../models/classroom.model.js";
 
 export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
-  console.log(req.params.floorNo);
-  console.log(req.query);
+  // console.log(req.params.floorNo);
+  // console.log(req.query);
   const { room } = req.query;
 
-  const classroom = await Classroom.findOne({
-    roomNo: room,
-  });
+  // const classroom = await Classroom.findOne({
+  //   roomNo: room,
+  // });
 
-  const classes = classroom.classes;
+  const data = await Classroom.aggregate([
+    {
+      $match: {
+        roomNo: room,
+      },
+    },
+    {
+      $unwind: "$classes",
+    },
+    {
+      $lookup: {
+        from: "teachers",
+        localField: "classes.teacher",
+        foreignField: "_id",
+        as: "teacherDetails",
+      },
+    },
+    {
+      $unwind: "$teacherDetails",
+    },
+    {
+      $addFields: {
+        "classes.teacher": "$teacherDetails.name",
+      },
+    },
+    {
+      $group: {
+        _id: "$roomNo",
+        classes: {
+          $push: "$classes",
+        },
+      },
+    },
+    {
+      $project: {
+        "classes.batch": 1,
+        "classes.teacher": 1,
+        "classes.startTime": 1,
+        "classes.endTime": 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  console.log(data[0].classes);
 
   res.status(200).json({
     status: "success",
     message: "Classroom details fetched successfully",
-    classes,
+    classes: data[0].classes,
   });
 });
 
@@ -31,12 +75,13 @@ export const createClass = catchAsyncError(async (req, res, _) => {
   }
   const { room } = req.query;
   const { batch, teacherId } = req.body;
+
   const startTime = new Date().toISOString();
-  console.log(startTime);
+
   let endTime = new Date(startTime);
   endTime.setHours(endTime.getHours() + 1);
   endTime = endTime.toISOString();
-  console.log(endTime);
+
   const newClassroom = await Classroom.create({
     roomNo: room,
     floorNo,
@@ -54,5 +99,38 @@ export const createClass = catchAsyncError(async (req, res, _) => {
     status: "success",
     message: "Class created successfully",
     data: newClassroom,
+  });
+});
+
+export const addClass = catchAsyncError(async (req, res, _) => {
+  const { room } = req.query;
+  const { floorNo } = req.params;
+  const { batch, teacherId } = req.body;
+
+  const startTime = new Date().toISOString();
+
+  let endTime = new Date(startTime);
+  endTime.setHours(endTime.getHours() + 1);
+  endTime = endTime.toISOString();
+
+  const newData = await Classroom.findOneAndUpdate(
+    { roomNo: room },
+    {
+      $push: {
+        classes: {
+          batch,
+          teacher: teacherId,
+          startTime,
+          endTime,
+        },
+      },
+    },
+    { new: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Class added successfully",
+    data: newData,
   });
 });
