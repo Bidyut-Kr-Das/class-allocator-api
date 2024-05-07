@@ -84,7 +84,7 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
     },
   ]);
 
-  console.log(data[0].classes);
+  // console.log(data[0].classes);
 
   res.status(200).json({
     status: "success",
