@@ -2,6 +2,7 @@ import ApiError from "#utils/apiError.js";
 
 import catchAsyncError from "#utils/catchAsyncError.js";
 import Classroom from "../models/classroom.model.js";
+import ClassSlot from "../models/classSlots.model.js";
 
 export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
   // console.log(req.params.floorNo);
@@ -15,7 +16,7 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
   const data = await Classroom.aggregate([
     {
       $match: {
-        roomNo: room,
+        roomNo: "403",
       },
     },
     {
@@ -35,6 +36,42 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
     {
       $addFields: {
         "classes.teacher": "$teacherDetails.name",
+        "classes.startTime": {
+          $arrayElemAt: ["$classes.slots", 0],
+        },
+        "classes.endTime": {
+          $arrayElemAt: ["$classes.slots", -1],
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "classslots",
+        localField: "classes.startTime",
+        foreignField: "slot",
+        as: "startSlot",
+      },
+    },
+    {
+      $lookup: {
+        from: "classslots",
+        localField: "classes.endTime",
+        foreignField: "slot",
+        as: "endSlot",
+      },
+    },
+    {
+      $unwind: "$startSlot",
+    },
+    {
+      $unwind: "$endSlot",
+    },
+    {
+      $project: {
+        "classes.batch": 1,
+        "classes.teacher": 1,
+        "classes.startTime": "$startSlot.startTime",
+        "classes.endTime": "$endSlot.endTime",
       },
     },
     {
@@ -43,15 +80,6 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
         classes: {
           $push: "$classes",
         },
-      },
-    },
-    {
-      $project: {
-        "classes.batch": 1,
-        "classes.teacher": 1,
-        "classes.startTime": 1,
-        "classes.endTime": 1,
-        _id: 0,
       },
     },
   ]);
@@ -74,13 +102,7 @@ export const createClass = catchAsyncError(async (req, res, _) => {
     );
   }
   const { room } = req.query;
-  const { batch, teacherId } = req.body;
-
-  const startTime = new Date().toISOString();
-
-  let endTime = new Date(startTime);
-  endTime.setHours(endTime.getHours() + 1);
-  endTime = endTime.toISOString();
+  const { batch, teacherId, slots } = req.body;
 
   const newClassroom = await Classroom.create({
     roomNo: room,
@@ -89,8 +111,7 @@ export const createClass = catchAsyncError(async (req, res, _) => {
       {
         batch,
         teacher: teacherId,
-        startTime,
-        endTime,
+        slots,
       },
     ],
   });
@@ -104,15 +125,22 @@ export const createClass = catchAsyncError(async (req, res, _) => {
 
 export const addClass = catchAsyncError(async (req, res, _) => {
   const { room } = req.query;
-  const { floorNo } = req.params;
-  const { batch, teacherId } = req.body;
+  const { batch, teacherId, slots } = req.body;
 
-  const startTime = new Date().toISOString();
+  //check if the class slot available or not
+  const isSlotTaken = await Classroom.aggregate([
+    {
+      $unwind: "$classes",
+    },
+    {
+      $match: {
+        roomNo: room,
+        "classes.slots": { $in: slots },
+      },
+    },
+  ]);
 
-  let endTime = new Date(startTime);
-  endTime.setHours(endTime.getHours() + 1);
-  endTime = endTime.toISOString();
-
+  if (isSlotTaken.length > 0) throw new ApiError(400, "Slot full");
   const newData = await Classroom.findOneAndUpdate(
     { roomNo: room },
     {
@@ -120,8 +148,7 @@ export const addClass = catchAsyncError(async (req, res, _) => {
         classes: {
           batch,
           teacher: teacherId,
-          startTime,
-          endTime,
+          slots,
         },
       },
     },
@@ -134,3 +161,17 @@ export const addClass = catchAsyncError(async (req, res, _) => {
     data: newData,
   });
 });
+
+export const createClassSlots = catchAsyncError(async (req, res, _) => {
+  const { slot, startTime, endTime } = req.body;
+  const newClassSlot = await ClassSlot.create({
+    slot,
+    startTime,
+    endTime,
+  });
+  res.status(201).json({
+    newClassSlot,
+  });
+});
+
+export const getClassSlots = catchAsyncError(async (req, res, _) => {});

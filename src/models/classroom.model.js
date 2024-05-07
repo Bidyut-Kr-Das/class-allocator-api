@@ -24,12 +24,8 @@ const classroomSchema = new Schema(
             ref: "Teacher",
             required: true,
           },
-          startTime: {
-            type: Date,
-            required: true,
-          },
-          endTime: {
-            type: Date,
+          slots: {
+            type: [Number],
             required: true,
           },
         },
