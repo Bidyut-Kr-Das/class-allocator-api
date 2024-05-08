@@ -94,26 +94,23 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
 });
 
 export const createClass = catchAsyncError(async (req, res, _) => {
-  const { floorNo } = req.params;
+  let { floorNo } = req.params;
   if (floorNo > 5 || floorNo < 0) {
     return new ApiError(
       401,
       `floor no exceeds the actual building 0_0. Lift broke through the ceiling.... weeeeeee!!!`
     );
   }
+  floorNo = parseInt(floorNo);
+  console.log(floorNo, typeof floorNo);
   const { room } = req.query;
-  const { batch, teacherId, slots } = req.body;
+  console.log(room, typeof room);
+  // const { batch, teacherId, slots } = req.body;
 
   const newClassroom = await Classroom.create({
-    roomNo: room,
     floorNo,
-    classes: [
-      {
-        batch,
-        teacher: teacherId,
-        slots,
-      },
-    ],
+    roomNo: room,
+    classes: [],
   });
 
   res.status(201).json({
@@ -174,4 +171,7 @@ export const createClassSlots = catchAsyncError(async (req, res, _) => {
   });
 });
 
-export const getClassSlots = catchAsyncError(async (req, res, _) => {});
+export const hardwareClassAllocation = catchAsyncError(async (req, res, _) => {
+  console.log(req.query);
+  res.status(200).send("req reached");
+});
