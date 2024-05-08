@@ -8,6 +8,7 @@ import corsSetup from "#cors/index.js";
 //helper function import
 import handleError from "#middlewares/error.middleware.js";
 import classroomRouter from "#routes/classroom.routes.js";
+import teacherRouter from "#routes/teacher.routes.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(`/api/v2/classrooms`, classroomRouter);
+app.use(`/api/v2/teachers`, teacherRouter);
 
 app.use(handleError);
 

@@ -3,11 +3,11 @@ import { model, Schema } from "mongoose";
 const teacherSchema = new Schema(
   {
     name: {
-      type: string,
+      type: String,
       required: true,
     },
     email: {
-      type: string,
+      type: String,
       required: true,
     },
   },
