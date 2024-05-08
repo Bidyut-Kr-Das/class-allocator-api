@@ -11,6 +11,6 @@ export const getTeachers = catchAsyncError(async (req, res, _) => {
   ]);
   res.status(200).json({
     status: "success",
-    teachers,
+    data: teachers,
   });
 });
