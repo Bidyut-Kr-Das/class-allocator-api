@@ -24,7 +24,7 @@ export const checkTeacher = catchAsyncError(async (req, res, _) => {
   });
 
   if (!teacher) {
-    res.status(404).send("Not Authorised  ");
+    return res.status(404).send("Not Authorised  ");
   }
 
   res.status(200).send("Authorised      ");
