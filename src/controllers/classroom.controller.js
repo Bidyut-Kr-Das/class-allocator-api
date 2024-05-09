@@ -3,6 +3,7 @@ import ApiError from "#utils/apiError.js";
 import catchAsyncError from "#utils/catchAsyncError.js";
 import Classroom from "../models/classroom.model.js";
 import ClassSlot from "../models/classSlots.model.js";
+import Teacher from "../models/teacher.model.js";
 
 export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
   // console.log(req.params.floorNo);
@@ -172,6 +173,57 @@ export const createClassSlots = catchAsyncError(async (req, res, _) => {
 });
 
 export const hardwareClassAllocation = catchAsyncError(async (req, res, _) => {
+  //{ slot: '2', class: '1', card: '163138252253' }
   console.log(req.query);
-  res.status(200).send("req reached");
+
+  const { slot, classspan, card, room } = req.query;
+
+  const { _id } = await Teacher.findOne({
+    card,
+  });
+
+  console.log(_id);
+
+  //calculate the slot array
+  const slotArray = [];
+
+  if (classspan === "1") slotArray.push(parseInt(slot));
+  else {
+    if (slot === "9") slotArray.push(9);
+    else {
+      slotArray.push(parseInt(slot));
+      slotArray.push(parseInt(slot) + 1);
+    }
+  }
+
+  // console.log(slotArray);
+
+  const isSlotTaken = await Classroom.aggregate([
+    {
+      $unwind: "$classes",
+    },
+    {
+      $match: {
+        roomNo: room,
+        "classes.slots": { $in: slotArray },
+      },
+    },
+  ]);
+
+  if (isSlotTaken.length > 0) return res.status(400).send("Slot full       ");
+
+  const newData = await Classroom.findOneAndUpdate(
+    { roomNo: room },
+    {
+      $push: {
+        classes: {
+          teacher: _id,
+          slots: slotArray,
+        },
+      },
+    },
+    { new: true }
+  );
+
+  res.status(200).send("Class Booked.   ");
 });
