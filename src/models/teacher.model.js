@@ -10,6 +10,10 @@ const teacherSchema = new Schema(
       type: String,
       required: true,
     },
+    card: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -9,8 +9,23 @@ export const getTeachers = catchAsyncError(async (req, res, _) => {
       },
     },
   ]);
+
   res.status(200).json({
     status: "success",
     data: teachers,
   });
+});
+
+export const checkTeacher = catchAsyncError(async (req, res, _) => {
+  const { card } = req.query;
+
+  const teacher = await Teacher.findOne({
+    card,
+  });
+
+  if (!teacher) {
+    res.status(404).send("Not Authorised  ");
+  }
+
+  res.status(200).send("Authorised      ");
 });
