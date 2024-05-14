@@ -73,6 +73,7 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
         "classes.teacher": 1,
         "classes.startTime": "$startSlot.startTime",
         "classes.endTime": "$endSlot.endTime",
+        "classes.slots": 1,
       },
     },
     {
