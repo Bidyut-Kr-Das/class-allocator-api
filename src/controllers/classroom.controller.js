@@ -161,6 +161,22 @@ export const addClass = catchAsyncError(async (req, res, _) => {
   });
 });
 
+export const getClassStartTime = catchAsyncError(async (req, res, _) => {
+  const classSlots = await ClassSlot.aggregate([
+    {
+      $group: {
+        _id: "null",
+        startTime: { $push: "$startTime" },
+      },
+    },
+  ]);
+  res.status(200).json({
+    status: "Success",
+    message: "Class start time fetched successfully",
+    startTime: classSlots[0].startTime,
+  });
+});
+
 export const createClassSlots = catchAsyncError(async (req, res, _) => {
   const { slot, startTime, endTime } = req.body;
   const newClassSlot = await ClassSlot.create({

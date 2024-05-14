@@ -5,11 +5,12 @@ import {
   addClass,
   createClassSlots,
   hardwareClassAllocation,
+  getClassStartTime,
 } from "#controllers/classroom.controller.js";
 
 const router = Router();
 
-router.route(`/slots`).post(createClassSlots);
+router.route(`/slots`).get(getClassStartTime).post(createClassSlots);
 
 router.route(`/hwClass`).get(hardwareClassAllocation);
 router
