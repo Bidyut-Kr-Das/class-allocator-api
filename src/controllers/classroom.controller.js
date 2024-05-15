@@ -17,7 +17,7 @@ export const getClassroomDetails = catchAsyncError(async (req, res, _) => {
   const data = await Classroom.aggregate([
     {
       $match: {
-        roomNo: "403",
+        roomNo: room,
       },
     },
     {
