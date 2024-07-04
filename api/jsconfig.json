@@ -1,9 +1,0 @@
-{
-    "include": [
-        "src/**/*.controller.js",
-        "src/**/*.model.js",
-        "src/**/*.middleware.js",
-        "src/**/*.routes.js",
-    
-    ]
-}

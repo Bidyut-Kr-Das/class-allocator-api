@@ -1,6 +1,6 @@
-import ApiError from "#utils/apiError.js";
+import ApiError from "../utils/apiError.js";
 
-import catchAsyncError from "#utils/catchAsyncError.js";
+import catchAsyncError from "../utils/catchAsyncError.js";
 import Classroom from "../models/classroom.model.js";
 import ClassSlot from "../models/classSlots.model.js";
 import Teacher from "../models/teacher.model.js";

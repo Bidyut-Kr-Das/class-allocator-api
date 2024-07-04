@@ -6,7 +6,7 @@ import {
   createClassSlots,
   hardwareClassAllocation,
   getClassStartTime,
-} from "#controllers/classroom.controller.js";
+} from "../controllers/classroom.controller.js";
 
 const router = Router();
 

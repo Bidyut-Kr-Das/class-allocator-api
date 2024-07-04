@@ -3,12 +3,12 @@ import express from "express";
 import cookieParser from "cookie-parser";
 
 //cors setup
-import corsSetup from "#cors/index.js";
+import corsSetup from "./cors/index.js";
 
 //helper function import
-import handleError from "#middlewares/error.middleware.js";
-import classroomRouter from "#routes/classroom.routes.js";
-import teacherRouter from "#routes/teacher.routes.js";
+import handleError from "./middlewares/error.middleware.js";
+import classroomRouter from "./routes/classroom.routes.js";
+import teacherRouter from "./routes/teacher.routes.js";
 
 const app = express();
 

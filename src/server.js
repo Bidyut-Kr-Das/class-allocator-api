@@ -3,8 +3,8 @@ import { config } from "dotenv";
 config();
 
 //app and helper function import
-import app from "#src/app.js";
-import connectDB from "#database/index.js";
+import app from "./app.js";
+import connectDB from "./database/index.js";
 
 connectDB()
   .then(() => {
