@@ -10,7 +10,7 @@ connectDB()
   .then(() => {
     console.log(`Connected to database.`);
   })
-  .catch(error => {
+  .catch((error) => {
     throw Error(error);
   });
 
@@ -18,3 +18,4 @@ const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+export { app };
